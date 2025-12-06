@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.core.files.storage import default_storage
 from django.conf import settings
 import os
-
+from ml_model.inference import predict
 
 @api_view(['POST'])
 def predict_image(request):
