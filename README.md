@@ -1,13 +1,13 @@
 # Django Coursework Project
 
-A full-stack web application built with Django framework demonstrating core web development.
+A full-stack web application built with the Django framework, demonstrating core web development.
 ## Installation
 
 ### Prerequisites
 
 - Python 3.8 or higher
 - pip package manager
-- Git
+
 
 ### Setup Instructions
 
@@ -17,7 +17,7 @@ git clone https://github.com/Bishnu-alt/djangocoursework.git
 cd djangocoursework
 ```
 
-2. Create and activate virtual environment:
+2. Create and activate a virtual environment:
 ```bash
 # Windows
 python -m venv venv
