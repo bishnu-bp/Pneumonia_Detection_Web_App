@@ -1,33 +1,44 @@
+# ml_model/inference.py  ← FINAL VERSION FOR DJANGO (WORKS NOW!)
 import torch
-from torchvision import transforms, models
-from PIL import Image
+import numpy as np
 import os
+from PIL import Image
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "ml_model/resnet_model.pth")
-
-
-model = models.resnet18(pretrained=False)
-model.fc = torch.nn.Linear(model.fc.in_features, 2) 
-
-state_dict = torch.load(MODEL_PATH, map_location="cpu")
-model.load_state_dict(state_dict)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "ml_model", "resnet_model.pth")
 
 
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError(f"MODEL NOT FOUND! Expected at: {MODEL_PATH}")
+
+from torchvision.models.resnet import ResNet
+torch.serialization.add_safe_globals([ResNet])
+
+checkpoint = torch.load(MODEL_PATH, map_location='cpu', weights_only=False)
+model = checkpoint['model']
 model.eval()
 
-
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
+# Exact same preprocessing as training
+transform = A.Compose([
+    A.Resize(224, 224),
+    A.CLAHE(clip_limit=2.0, tile_grid_size=(8, 8), p=1.0),
+    A.Normalize(mean=[0.4815]*3, std=[0.2235]*3),
+    ToTensorV2()
 ])
 
 def predict(image_path):
     img = Image.open(image_path).convert("RGB")
-    img_tensor = transform(img).unsqueeze(0)
+    img_np = np.array(img)
+
+    augmented = transform(image=img_np)
+    input_tensor = augmented['image'].unsqueeze(0)
 
     with torch.no_grad():
-        output = model(img_tensor)
-        _, predicted = torch.max(output, 1)
+        output = model(input_tensor)
+        prob = torch.softmax(output, dim=1)[0]
+        confidence = prob.max().item() * 100
+        pred_class = prob.argmax().item()
 
-    return int(predicted.item())
+    return ("PNEUMONIA" if pred_class == 1 else "NORMAL"), round(confidence, 2)
