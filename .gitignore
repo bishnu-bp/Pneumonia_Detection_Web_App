@@ -25,6 +25,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+backend/coursework/ml_model/resnet_model.pth
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
