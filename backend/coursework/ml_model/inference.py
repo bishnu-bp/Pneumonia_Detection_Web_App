@@ -1,33 +1,10 @@
-import os
-import torch
-import numpy as np
+import base64
+import cv2
 from PIL import Image
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-from torchvision.models.resnet import ResNet
-
-
-torch.serialization.add_safe_globals([ResNet])
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, "ml_model", "resnet_model.pth")
-
-if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError(f"MODEL NOT FOUND! Expected at: {MODEL_PATH}")
-
-
-checkpoint = torch.load(MODEL_PATH, map_location="cpu", weights_only=False)
-model = checkpoint["model"]
-model.eval()
-
-
-transform = A.Compose([
-    A.Resize(224, 224),
-    A.CLAHE(clip_limit=2.0, tile_grid_size=(8, 8), p=1.0),
-    A.Normalize(mean=[0.4815, 0.4815, 0.4815],
-                std=[0.2235, 0.2235, 0.2235]),
-    ToTensorV2(),
-])
+import numpy as np
+import torch
+import os
+from ml_model.model_loader import model, gradcam, transform
 
 def predict(image_path):
     if not os.path.exists(image_path):
@@ -45,6 +22,14 @@ def predict(image_path):
 
     confidence = float(prob.max() * 100)
     pred_class = int(prob.argmax())
-
     label = "PNEUMONIA" if pred_class == 1 else "NORMAL"
-    return label, round(confidence, 2)
+
+    cam = gradcam.generate(input_tensor, class_idx=pred_class)
+    cam = cv2.resize(cam, (img_np.shape[1], img_np.shape[0]))
+    heatmap = cv2.applyColorMap((cam * 255).astype("uint8"), cv2.COLORMAP_JET)
+    overlay = cv2.addWeighted(img_np, 0.5, heatmap, 0.5, 0)
+
+    _, buffer = cv2.imencode(".jpg", overlay)
+    heatmap_base64 = base64.b64encode(buffer).decode("utf-8")
+
+    return label, round(confidence, 2), heatmap_base64

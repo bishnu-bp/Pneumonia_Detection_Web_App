@@ -8,12 +8,15 @@
 .upload-title {
     margin-bottom: 25px;
     font-size: 36px;
+    text-align: center;
 }
 
 
 .upload-form {
     display: flex;
     gap: 15px;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -34,16 +37,19 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+    border: 1px solid #1A8EFD;
 }
 
 .predict-btn:hover {
-    background-color: #472a63;
+    color: #1A8EFD;
+    background-color: white;
+    border: 1px solid #1A8EFD;
 }
 
 
 .prediction-result {
     margin-top: 20px;
-    color: #333;
+    color: #1A8EFD;
     font-weight: bold;
     font-size: 18px;
 }

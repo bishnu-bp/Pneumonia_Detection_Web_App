@@ -3,7 +3,7 @@ import "../Styles/services.css";
 
 export default function ImageUpload() {
     const [file, setFile] = useState(null);
-    const [prediction, setPrediction] = useState("");
+    const [result, setResult] = useState(null); // store prediction, confidence, gradcam
 
     const handleUpload = async (e) => {
         e.preventDefault();
@@ -23,7 +23,8 @@ export default function ImageUpload() {
             });
 
             const data = await res.json();
-            setPrediction(data.prediction);
+            // data should include prediction, confidence, and gradcam_image
+            setResult(data);
         } catch (err) {
             console.error("Error uploading image:", err);
             alert("Failed to get prediction. Try again.");
@@ -31,7 +32,7 @@ export default function ImageUpload() {
     };
 
     return (
-        <div className="upload-container">
+        <div className="upload-container #services" id="services">
             <h2 className="upload-title">Upload Image for Prediction</h2>
             <form className="upload-form" onSubmit={handleUpload}>
                 <input
@@ -43,7 +44,22 @@ export default function ImageUpload() {
                 <button type="submit" className="predict-btn">Predict</button>
             </form>
 
-            {prediction && <h3 className="prediction-result">Result: {prediction}</h3>}
+            {result && (
+                <div className="prediction-result">
+                    <h3>Prediction: {result.prediction}</h3>
+                    <p>Confidence: {result.confidence}%</p>
+                    {result.gradcam_image && (
+                        <div>
+                            <h4>Grad-CAM:</h4>
+                            <img
+                                src={`data:image/jpeg;base64,${result.gradcam_image}`}
+                                alt="Grad-CAM"
+                                style={{ maxWidth: "100%", borderRadius: "10px", marginTop: "10px" }}
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
