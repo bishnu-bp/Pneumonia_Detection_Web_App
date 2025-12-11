@@ -3,6 +3,8 @@ import Hero from '../components/Hero'
 import Services from '../components/Services'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
+import Login from './Login'
+
 
 
 function Home() {
@@ -12,6 +14,8 @@ function Home() {
         <Hero />
         <Services />
         <Footer />
+        <Login  />
+        
     </div>
   )
 }

@@ -1,24 +1,12 @@
 import React, { useState } from "react";
 import "../Styles/Navbar.css";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const [nav, setNav] = useState(false);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const navigate = useNavigate();
 
-  const openNav = () => {
-    setNav(!nav);
-  };
-
-  const handleChatBtnClick = () => {
-    if (!isButtonDisabled) {
-      toast.info("Experiencing high traffic, Please wait a moment.", {
-        position: toast.POSITION.TOP_CENTER,
-        onOpen: () => setIsButtonDisabled(true),
-        onClose: () => setIsButtonDisabled(false),
-      });
-    }
+  const handleLoginBtnClick = () => {
+    navigate("/register");  
   };
 
   return (
@@ -29,50 +17,22 @@ function Navbar() {
         </Link>
       </h1>
 
-      {/* Desktop */}
       <ul className="navbar-items">
         <li>
-          <Link to="/" className="navbar-links">
-            Home
-          </Link>
+          <Link to="/" className="navbar-links">Home</Link>
         </li>
         <li>
-          <a href="#services" className="navbar-links">
-            Services
-          </a>
+          <a href="#services" className="navbar-links">Services</a>
         </li>
       </ul>
 
       <button
         className="navbar-btn"
         type="button"
-        disabled={isButtonDisabled}
-        onClick={handleChatBtnClick}
+        onClick={handleLoginBtnClick}
       >
-         Login 
+        Login
       </button>
-
-      {/* Mobile */}
-      <div className={`mobile-navbar ${nav ? "open-nav" : ""}`}>
-        <div onClick={openNav} className="mobile-navbar-close">
-        </div>
-
-        <ul className="mobile-navbar-links">
-          <li>
-            <Link onClick={openNav} to="/">
-              Home
-            </Link>
-          </li>
-          <li>
-            <a onClick={openNav} href="#services">
-              Services
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Hamburger Icon */}
-      
     </div>
   );
 }

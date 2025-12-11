@@ -3,7 +3,7 @@ import "../Styles/services.css";
 
 export default function ImageUpload() {
     const [file, setFile] = useState(null);
-    const [result, setResult] = useState(null); // store prediction, confidence, gradcam
+    const [result, setResult] = useState(null); 
 
     const handleUpload = async (e) => {
         e.preventDefault();
@@ -23,7 +23,7 @@ export default function ImageUpload() {
             });
 
             const data = await res.json();
-            // data should include prediction, confidence, and gradcam_image
+            
             setResult(data);
         } catch (err) {
             console.error("Error uploading image:", err);
